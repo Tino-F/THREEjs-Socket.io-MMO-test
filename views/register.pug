@@ -1,0 +1,32 @@
+html
+  head
+    title MMO
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js", integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=", crossorigin="anonymous")
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")
+    link(rel='stylesheet', href='css/main.css')
+  body
+    div.register.container(align='center')
+      h1 Register
+
+      form(method='post', action='/register')
+        span Username
+        br
+        input(type='text', name='username')
+
+        br
+
+        span Password
+        br
+        input(type='password', name='password')
+
+        br
+
+        span Color
+        br
+        input(type='color', name='color')
+
+        br
+        br
+
+        button.btn.btn-default(type='submit', value='submit') submit
