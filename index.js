@@ -33,23 +33,23 @@ passport.use( new LocalStrat( ( username, password, done ) => {
   invisible.find_user( { Name: username }, ( err, user ) => {
     if ( !err ) {
       if ( !user ) {
-        done( null, false, 'Invalid username.' );
+        done( null, null, 'Invalid username.' );
       } else {
         if ( password === user.Password ) {
-          done( false, user, false );
+          done( null, user );
         } else {
-          done( null, false, 'Incorrect password.' );
+          done( null, null, 'Incorrect password.' );
         }
       }
     } else {
       cosnole.log( err );
-      done( null, false, 'Authentication failed due to an internal server error.' );
+      done( null, null, 'Authentication failed due to an internal server error.' );
     }
   });
 
 }));
 
-passport.serializeUser( (user, done) => done( null, user ) );
+passport.serializeUser( ( user, done ) => done( null, user ) );
 passport.deserializeUser( ( user, done ) => done( null, user ) );
 
 const server = require('http').Server( app );
@@ -65,6 +65,10 @@ io.on('connection', socket => {
 })
 */
 
+app.get('/isAuth', (req, res) => {
+  res.send( req.isAuthenticated() );
+});
+
 app.get( '/', invisible.home );
 
 app.get( '/login', invisible.login );
@@ -72,16 +76,19 @@ app.get( '/login', invisible.login );
 app.post( '/login', ( req, res ) => {
 
   passport.authenticate( 'local', ( info, user, err ) => {
-
     if ( !err ) {
-      return res.redirect( '/' );
+      req.logIn( user, ( err ) => {
+        if ( !err ) {
+          return res.redirect( '/' );
+        } else {
+          return res.render( 'login', { err: 'Internal server error.' } );
+        }
+      });
     } else {
-      return res.render( 'login', {err: err} );
+      return res.render( 'login', { err: err } );
     }
-
   })( req, res );
-
-});
+} );
 
 app.get( '/register', invisible.register );
 app.post( '/register', invisible.register_post );
