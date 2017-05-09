@@ -10,6 +10,10 @@ exports.decrypt = ( text ) => {
 
 };
 
+exports.random = ( min, max ) => {
+  
+};
+
 exports.find_user = ( q, callback ) => {
   let user;
 

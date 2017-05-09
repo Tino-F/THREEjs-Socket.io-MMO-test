@@ -66,14 +66,31 @@ io.use(socketsession(session, {
 var users = [];
 
 io.on('connection', socket => {
+  console.log( socket.handshake.session )
+
+  socket.broadcast.emit( 'new_user', {
+    user: {
+      position: {
+        x: invisible.random( 1, 600 ),
+        z: invisible.random( 1, 600 ),
+        y: invisible.random( 1, 600 )
+      },
+      color: socket.handshake.session.passport.user.color,
+      Name: socket.handshake.session.passport.user.Name
+    }
+  });
 
   users.push( socket );
 
   socket.on( 'change', player => {
     console.log( player );
     socket.broadcast.emit( 'change', player );
-  })
+  });
 
+  socket.on( 'disconnect', () => {
+    socket.broadcast.emit( 'user_disconnect', { user: 'user data' } );
+    users.splice( users.indexOf( socket ), 1 );
+  } );
 })
 
 app.get( '/', invisible.home );

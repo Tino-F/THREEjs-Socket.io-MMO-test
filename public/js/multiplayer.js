@@ -6,14 +6,14 @@ function add_user ( user ) {
   shape.position.set( user.position.x, user.position.y, user.position.z );
 }
 
-document.addEventListener('mousedown', () => {
+document.addEventListener('mousemove', () => {
   host.emit('change', {
     user: {
       position: {
 
-          x: me.position.x,
-          y: me.position.y,
-          z: me.position.z
+          x: camera.position.x,
+          y: camera.position.y,
+          z: camera.position.z
       },
       color: me.material.color
     }
