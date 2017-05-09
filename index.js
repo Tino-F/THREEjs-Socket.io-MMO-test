@@ -71,9 +71,9 @@ io.on('connection', socket => {
   socket.broadcast.emit( 'new_user', {
     user: {
       position: {
-        x: invisible.random( 1, 400 ),
-        z: invisible.random( 1, 400 ),
-        y: invisible.random( 1, 400 )
+        x: invisible.random( -400, 400 ),
+        z: invisible.random( -400, 400 ),
+        y: invisible.random( -400, 400 )
       },
       color: socket.handshake.session.passport.user.color,
       Name: socket.handshake.session.passport.user.Name

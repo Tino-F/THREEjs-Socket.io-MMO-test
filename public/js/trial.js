@@ -1,6 +1,6 @@
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
-var camera = new THREE.PerspectiveCamera(75, WIDTH/HEIGHT, 0.01, 600);
+var camera = new THREE.PerspectiveCamera(75, WIDTH/HEIGHT, 0.01, 1200);
 camera.position.z = 100;
 var scene = new THREE.Scene();
 scene.updateMatrixWorld( true );
