@@ -67,7 +67,12 @@ var users = [];
 
 io.on('connection', socket => {
 
-  user.push( socket );
+  users.push( socket );
+
+  socket.on( 'change', player => {
+    console.log( player );
+    socket.broadcast.emit( 'change', player );
+  })
 
 })
 

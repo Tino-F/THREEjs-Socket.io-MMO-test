@@ -29,8 +29,8 @@ scene.add( amb_light );
 
 var shape_g = new THREE.ConeBufferGeometry( 40, 40, 40 );
 var shape_m = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-var shape = new THREE.Line( shape_g, shape_m );
-scene.add( shape );
+var me = new THREE.Line( shape_g, shape_m );
+scene.add( me );
 
 function main () {
   requestAnimationFrame( main );
@@ -39,3 +39,29 @@ function main () {
 }
 
 main();
+
+//socket.io
+
+var host = io.connect('http://localhost:1000/');
+
+function add_user ( user ) {
+  var shape_geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+  var shape_mesh = new THREE.MeshLambertMaterial( { color: user.color } );
+  shape.position.set( user.position.x, user.position.y, user.position.z );
+}
+
+document.addEventListener('mousedrag', () => {
+  host.emit('change', {
+    user: {
+      position: {
+
+          x: camera.position.x,
+          y: camera.position.y,
+          z: camera.position.z
+      },
+      color: 0xffffff
+    }
+  }
+);})
+
+host.on( 'change', function ( player ){ console.log( player ) } );
