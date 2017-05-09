@@ -33,17 +33,17 @@ passport.use( new LocalStrat( ( username, password, done ) => {
   invisible.find_user( { Name: username }, ( err, user ) => {
     if ( !err ) {
       if ( !user ) {
-        done( null, false, { err: 'Invalid username.' } );
+        done( null, false, 'Invalid username.' );
       } else {
         if ( password === user.Password ) {
-          done( false, user );
+          done( false, user, false );
         } else {
-          done( null, false, { err: 'Incorrect password.' } );
+          done( null, false, 'Incorrect password.' );
         }
       }
     } else {
       cosnole.log( err );
-      done( null, false, { err: 'Authentication failed due to an internal server error.' } );
+      done( null, false, 'Authentication failed due to an internal server error.' );
     }
   });
 
@@ -68,7 +68,20 @@ io.on('connection', socket => {
 app.get( '/', invisible.home );
 
 app.get( '/login', invisible.login );
-app.post( '/login', passport.authenticate('local'), invisible.login_post );
+
+app.post( '/login', ( req, res ) => {
+
+  passport.authenticate( 'local', ( info, user, err ) => {
+
+    if ( !err ) {
+      return res.redirect( '/' );
+    } else {
+      return res.render( 'login', {err: err} );
+    }
+
+  })( req, res );
+
+});
 
 app.get( '/register', invisible.register );
 app.post( '/register', invisible.register_post );
