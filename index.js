@@ -71,9 +71,9 @@ io.on('connection', socket => {
   socket.broadcast.emit( 'new_user', {
     user: {
       position: {
-        x: invisible.random( 1, 600 ),
-        z: invisible.random( 1, 600 ),
-        y: invisible.random( 1, 600 )
+        x: invisible.random( 1, 400 ),
+        z: invisible.random( 1, 400 ),
+        y: invisible.random( 1, 400 )
       },
       color: socket.handshake.session.passport.user.color,
       Name: socket.handshake.session.passport.user.Name
@@ -83,6 +83,7 @@ io.on('connection', socket => {
   users.push( socket );
 
   socket.on( 'change', player => {
+    player.Name = socket.handshake.session.passport.user.Name;
     console.log( player );
     socket.broadcast.emit( 'change', player );
   });

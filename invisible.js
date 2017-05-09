@@ -11,7 +11,7 @@ exports.decrypt = ( text ) => {
 };
 
 exports.random = ( min, max ) => {
-  
+  return Math.floor( Math.random() * ( max - min + 1 ) + min );
 };
 
 exports.find_user = ( q, callback ) => {
