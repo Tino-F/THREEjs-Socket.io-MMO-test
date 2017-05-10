@@ -64,14 +64,6 @@ exports.login = ( req, res ) => {
   }
 };
 
-exports.login_post = ( req, res ) => {
-  if( req.isAuthenticated() ) {
-    res.redirect( '/' );
-  } else {
-    res.render( 'login', { err: 'Login failed.' } );
-  }
-};
-
 exports.register = ( req, res ) => {
   if ( req.isAuthenticated() ) {
     res.render('register', {err: 'You are currently logged in as another user.'});

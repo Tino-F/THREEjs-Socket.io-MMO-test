@@ -1,6 +1,6 @@
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
-var camera = new THREE.PerspectiveCamera(75, WIDTH/HEIGHT, 0.01, 1200);
+var camera = new THREE.PerspectiveCamera(75, WIDTH/HEIGHT, 0.001, 6000);
 camera.position.z = 100;
 var scene = new THREE.Scene();
 scene.updateMatrixWorld( true );
@@ -10,6 +10,17 @@ renderer.setSize( WIDTH, HEIGHT );
 renderer.setClearColor( 0x000000 );
 document.body.appendChild( renderer.domElement );
 var controls = new THREE.TrackballControls( camera );
+
+controls.addEventListener( 'change', () => {
+  host.emit('move', {
+    position: {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+    },
+    color: me.material.color
+  });
+});
 
 function randomNumber( min, max ) {
   return Math.floor(Math.random() * ( ( max - min ) + 1 ) + min );

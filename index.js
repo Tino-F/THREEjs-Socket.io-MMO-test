@@ -69,7 +69,6 @@ io.on('connection', socket => {
   console.log( socket.handshake.session )
 
   socket.broadcast.emit( 'new_user', {
-    user: {
       position: {
         x: invisible.random( -400, 400 ),
         z: invisible.random( -400, 400 ),
@@ -77,19 +76,17 @@ io.on('connection', socket => {
       },
       color: socket.handshake.session.passport.user.color,
       Name: socket.handshake.session.passport.user.Name
-    }
   });
 
   users.push( socket );
 
-  socket.on( 'change', player => {
+  socket.on( 'move', player => {
     player.Name = socket.handshake.session.passport.user.Name;
-    console.log( player );
-    socket.broadcast.emit( 'change', player );
+    socket.broadcast.emit( 'move', player );
   });
 
   socket.on( 'disconnect', () => {
-    socket.broadcast.emit( 'user_disconnect', { user: 'user data' } );
+    socket.broadcast.emit( 'user_disconnect', { Name: socket.handshake.session.passport.user.Name } );
     users.splice( users.indexOf( socket ), 1 );
   } );
 })
