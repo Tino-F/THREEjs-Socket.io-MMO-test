@@ -4,6 +4,25 @@ var player_data = [];
 var player_model_geometry = new THREE.BoxBufferGeometry( 40, 40, 40);
 var player_model_material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 
+function getUsers () {
+
+  socket.emit( 'gimme_users', users => {
+
+    for ( i=0; i < users.length; i++ ) {
+      players[ i ] = users[ i ].Name;
+      player_data[ i ] = users[ i ].Data;
+
+      var player_model = new THREE.Mesh( player_model_geometry, player_model_material );
+      scene.add( player_model );
+      player.data[ i ] = player_model;
+
+      player_data[ i ].model.position.set( user[ i ].position.x, user[ i ].position.y, user[ i ].position.z );
+    }
+
+  });
+
+};
+
 host.on( 'move', function ( user ){
 
   try {
@@ -11,11 +30,10 @@ host.on( 'move', function ( user ){
     console.log( user.x, user.y, user.z );
     console.log( JSON.stringify( user ) );
   } catch ( err ) {
-    console.log( "Can't remotely move your own player..." );
-    console.log( err );
+
   }
 
- } );
+});
 
 host.on( 'new_user', function( user ) {
 
