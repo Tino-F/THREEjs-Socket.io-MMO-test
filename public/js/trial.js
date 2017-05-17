@@ -18,6 +18,10 @@ controls.addEventListener( 'change', () => {
         y: camera.position.y,
         z: camera.position.z
     },
+    rotation: {
+      x: camera.rotation.x,
+      y: camera.rotation.y
+    },
     color: me.material.color
   });
 });

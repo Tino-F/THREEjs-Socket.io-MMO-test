@@ -44,7 +44,7 @@ passport.use( new LocalStrat( ( username, password, done ) => {
         }
       }
     } else {
-      cosnole.log( err );
+      console.log( err );
       done( null, null, 'Authentication failed due to an internal server error.' );
     }
   });
@@ -64,11 +64,11 @@ io.use(socketsession(session, {
 } ));
 
 var users = [];
+var user_data = [];
 
 io.on('connection', socket => {
-  console.log( socket.handshake.session )
 
-  socket.broadcast.emit( 'new_user', {
+  user_data.push( {
       position: {
         x: invisible.random( -400, 400 ),
         z: invisible.random( -400, 400 ),
@@ -76,17 +76,30 @@ io.on('connection', socket => {
       },
       color: socket.handshake.session.passport.user.color,
       Name: socket.handshake.session.passport.user.Name
-  });
+  } );
+
+  socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+
+  users.push( socket.handshake.session.passport.user.Name );
+
+  console.log( user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ]  );
+
+  socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
 
   users.push( socket );
 
+  socket.on( 'gimme_users', () => {
+    socket.emit( 'gimme_users', user_data );
+  })
+
   socket.on( 'move', player => {
     player.Name = socket.handshake.session.passport.user.Name;
+    user_data[ users.indexOf( player.Name ) ] = player;
     socket.broadcast.emit( 'move', player );
   });
 
   socket.on( 'disconnect', () => {
-    socket.broadcast.emit( 'user_disconnect', { Name: socket.handshake.session.passport.user.Name } );
+    socket.broadcast.emit( 'user_disconnect', socket.handshake.session.passport.user.Name );
     users.splice( users.indexOf( socket ), 1 );
   } );
 })
