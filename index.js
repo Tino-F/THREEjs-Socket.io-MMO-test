@@ -54,7 +54,7 @@ passport.use( new LocalStrat( ( username, password, done ) => {
       done( null, null, 'Authentication failed due to an internal server error.' );
 
     }
-    
+
   });
 
 }));
@@ -71,14 +71,15 @@ io.use(socketsession(session, {
     autoSave: true
 } ));
 
-var users = [];
-var user_data = [];
+const users = [];
+const user_data = [];
 
 function new_user ( socket ) {
 
-  console.log( socket.handshake.session.passport.user.Name, 'connected.' );
+  let Name = socket.handshake.session.passport.user.Name;
+  console.log( Name, 'connected.' );
 
-  if ( users.indexOf( socket.handshake.session.passport.user.Name ) > 0 ) {
+  if ( users.indexOf( Name ) < 0 ) {
 
     let user = {
         position: {
@@ -91,39 +92,85 @@ function new_user ( socket ) {
           y: false
         },
         color: socket.handshake.session.passport.user.color,
-        Name: socket.handshake.session.passport.user.Name
+        Name: Name
     };
 
     user_data.push( user );
-    users.push( socket.handshake.session.passport.user.Name );
-    socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
-    socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+    users.push( Name );
+    console.log( 'Sucessfully added new user to the board \n\n', user_data, '\n\n' );
+    socket.broadcast.emit( 'new_user', user );
+    socket.emit( 'your_position', user );
+  } else {
+    socket.emit( 'redirect' );
   }
+
+};
+
+function get_user_index ( s, callback ) {
+
+  let index = users.indexOf( s.handshake.session.passport.user.Name );
+  console.log( s.handshake.session.passport.user.Name, 'is at index', index );
+  console.log( user_data );
+  console.log( user_data[ index ] );
+  callback( index );
+
+};
+
+function list_current_users () {
+
+  console.log('There are currently', user_data.length, 'users.');
+
+  for( let i = 0; i < user_data.length; i++ ) {
+    console.log( i, '.', user_data[ i ] );
+  }
+
+  console.log( ' \n\n ' );
 
 };
 
 io.on('connection', socket => {
 
   if ( !socket.handshake.session.passport ) {
+
     socket.emit( 'redirect' );
+
   } else {
 
     new_user( socket );
+    list_current_users();
 
-    socket.on( 'your_position', () => {
-      socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+    socket.on( 'your_position', (  ) => {
+
+      get_user_index( socket, ( i ) => {
+
+        socket.emit( 'your_position', user_data[ i ] );
+        console.log( 'Sent:', user_data[ i ] );
+        console.log( 'Index:', i );
+
+      });
+
     });
 
     socket.on( 'gimme_users', () => {
-      socket.emit( 'gimme_users', user_data );
+
+      get_user_index( socket, ( i ) => {
+
+        let other_users = user_data.splice( 0 );
+        other_users.splice( i, 1 );
+        socket.emit( 'gimme_users', other_users );
+
+      })
+
     })
 
     socket.on( 'move', player => {
 
+      console.log( player );
+
       if ( player ) {
         player.Name = socket.handshake.session.passport.user.Name;
         user_data[ users.indexOf( player.Name ) ] = player;
-        socket.broadcast.emit( 'move', user_data[ users.indexOf( player.Name ) ] );
+        socket.broadcast.emit( 'move', player );
       }
 
       if ( !socket.handshake.session.passport.user ) {
@@ -133,6 +180,7 @@ io.on('connection', socket => {
     });
 
     socket.on( 'disconnect', () => {
+      console.log( socket.handshake.session.passport.user.Name, 'disconnected.' );
       socket.broadcast.emit( 'user_disconnect', socket.handshake.session.passport.user.Name );
       user_data.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
       users.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );

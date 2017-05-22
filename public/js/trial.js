@@ -11,7 +11,7 @@ renderer.setClearColor( 0x000000 );
 document.body.appendChild( renderer.domElement );
 var controls = new THREE.TrackballControls( camera );
 
-controls.addEventListener( 'change', () => {
+controls.addEventListener( 'change', function () {
 
   var user_data = {
     position: {
@@ -26,7 +26,15 @@ controls.addEventListener( 'change', () => {
     color: center_geo.material.color
   };
 
-  host.emit( 'move', user_data );
+  try {
+
+    host.emit( 'move', user_data );
+
+  } catch ( err ) {
+
+    console.log( err );
+
+  }
 
 });
 
