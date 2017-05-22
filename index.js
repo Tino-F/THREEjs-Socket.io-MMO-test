@@ -29,19 +29,32 @@ passport.use( new LocalStrat( ( username, password, done ) => {
 
   invisible.find_user( { Name: username }, ( err, user ) => {
     if ( !err ) {
+
       if ( !user ) {
+
         done( null, null, 'Invalid username.' );
+
       } else {
-        if ( password === user.Password ) {
+
+        if ( invisible.encrypt( password ) === user.Password ) {
+
           done( null, user );
+
         } else {
+
           done( null, null, 'Incorrect password.' );
+
         }
+
       }
+
     } else {
+
       console.log( err );
       done( null, null, 'Authentication failed due to an internal server error.' );
+
     }
+    
   });
 
 }));

@@ -1,13 +1,21 @@
 'use strict';
 const url = 'mongodb://0.0.0.0:27017/';
 const MongoClient = require('mongodb').MongoClient;
+const key = 'sheeeeeeeiiiiiiittttttttttttttttttt';
+const crypto = require( 'crypto' );
 
 exports.encrypt = ( text ) => {
-
+  let cipher = crypto.createCipher( 'aes-256-ctr', key );
+  let crypted = cipher.update( text, 'utf8', 'hex' );
+  crypted += cipher.final( 'hex' );
+  return crypted;
 };
 
 exports.decrypt = ( text ) => {
-
+  let decipher = crypto.createDecipher( 'aes-256-ctr', key );
+  let dec = decipher.update( text, 'utf8', 'hex' );
+  dec += decipher.final( 'hex' );
+  return dec;
 };
 
 exports.random = ( min, max ) => {
@@ -76,7 +84,7 @@ exports.register_post = ( req, res ) => {
 
   let new_user = {
     Name: req.body.username,
-    Password: req.body.password,
+    Password: this.encrypt( req.body.password ),
     Color: req.body.color
   };
 
