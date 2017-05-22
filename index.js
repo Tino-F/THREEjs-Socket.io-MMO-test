@@ -1,6 +1,5 @@
 "use strict";
 const MongoClient = require('mongodb').MongoClient;
-const sass = require('node-sass-middleware');
 const passport = require('passport');
 const LocalStrat = require('passport-local').Strategy;
 const path = require('path');
@@ -18,10 +17,6 @@ const session = expresssession({
   saveUninitialized: false
 });
 
-app.use( sass({
-  src: path.join( __dirname, 'public' ),
-  dest: path.join( __dirname, 'public' )
-}) );
 app.use( express.static( path.join( __dirname, 'public' ) ) );
 app.use( cookieParser() );
 app.use( bodyParser.urlencoded( { extended: false } ) );
@@ -56,8 +51,8 @@ passport.deserializeUser( ( user, done ) => done( null, user ) );
 
 const server = require( 'http' ).Server( app );
 const io = require( 'socket.io' )( server );
-server.listen( 1000 );
-console.log( 'Listening on port 1000.' );
+server.listen( 3000 );
+console.log( 'Listening on port 3000.' );
 
 io.use(socketsession(session, {
     autoSave: true
@@ -66,41 +61,57 @@ io.use(socketsession(session, {
 var users = [];
 var user_data = [];
 
-io.on('connection', socket => {
+function new_user ( socket ) {
 
-  user_data.push( {
+  console.log( socket.handshake.session.passport.user.Name, 'connected.' );
+
+  let user = {
       position: {
         x: invisible.random( -400, 400 ),
         z: invisible.random( -400, 400 ),
         y: invisible.random( -400, 400 )
       },
+      rotation: {
+        x: false,
+        y: false
+      },
       color: socket.handshake.session.passport.user.color,
       Name: socket.handshake.session.passport.user.Name
-  } );
+  };
 
+  user_data.push( user );
+  users.push( socket.handshake.session.passport.user.Name );
+  socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
   socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
 
-  users.push( socket.handshake.session.passport.user.Name );
+};
 
-  console.log( user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ]  );
+io.on('connection', socket => {
 
-  socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+  new_user( socket );
 
-  users.push( socket );
+  socket.on( 'your_position', () => {
+    socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+  });
 
   socket.on( 'gimme_users', () => {
     socket.emit( 'gimme_users', user_data );
   })
 
   socket.on( 'move', player => {
-    player.Name = socket.handshake.session.passport.user.Name;
-    user_data[ users.indexOf( player.Name ) ] = player;
-    socket.broadcast.emit( 'move', player );
+
+    if ( player ) {
+      player.Name = socket.handshake.session.passport.user.Name;
+      user_data[ users.indexOf( player.Name ) ] = player;
+      socket.broadcast.emit( 'move', user_data[ users.indexOf( player.Name ) ] );
+    }
+
   });
 
   socket.on( 'disconnect', () => {
     socket.broadcast.emit( 'user_disconnect', socket.handshake.session.passport.user.Name );
-    users.splice( users.indexOf( socket ), 1 );
+    user_data.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
+    users.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
   } );
 })
 

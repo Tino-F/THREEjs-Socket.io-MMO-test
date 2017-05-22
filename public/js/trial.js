@@ -12,7 +12,8 @@ document.body.appendChild( renderer.domElement );
 var controls = new THREE.TrackballControls( camera );
 
 controls.addEventListener( 'change', () => {
-  host.emit('move', {
+
+  var user_data = {
     position: {
         x: camera.position.x,
         y: camera.position.y,
@@ -22,8 +23,11 @@ controls.addEventListener( 'change', () => {
       x: camera.rotation.x,
       y: camera.rotation.y
     },
-    color: me.material.color
-  });
+    color: center_geo.material.color
+  };
+
+  host.emit( 'move', user_data );
+
 });
 
 function randomNumber( min, max ) {
@@ -44,8 +48,8 @@ scene.add( amb_light );
 
 var shape_g = new THREE.ConeBufferGeometry( 40, 40, 40 );
 var shape_m = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-var me = new THREE.Line( shape_g, shape_m );
-scene.add( me );
+var center_geo = new THREE.Line( shape_g, shape_m );
+scene.add( center_geo );
 
 function main () {
   requestAnimationFrame( main );

@@ -94,10 +94,11 @@ exports.register_post = ( req, res ) => {
         }
       });
 
+      db.close();
+
     } else {
       console.log('Failed to connect to database');
       res.render( 'register', { err: 'Registration failed due to an nternal server error. Please try again later.' } );
     }
-    db.close();
   });
 };
