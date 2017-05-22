@@ -65,25 +65,28 @@ function new_user ( socket ) {
 
   console.log( socket.handshake.session.passport.user.Name, 'connected.' );
 
-  let user = {
-      position: {
-        x: invisible.random( -400, 400 ),
-        z: invisible.random( -400, 400 ),
-        y: invisible.random( -400, 400 )
-      },
-      rotation: {
-        x: false,
-        y: false
-      },
-      color: socket.handshake.session.passport.user.color,
-      Name: socket.handshake.session.passport.user.Name
-  };
+  if ( users.indexOf( socket.handshake.session.passport.user.Name ) > 0 ) {
 
-  user_data.push( user );
-  users.push( socket.handshake.session.passport.user.Name );
-  socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
-  socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+    let user = {
+        position: {
+          x: invisible.random( -400, 400 ),
+          z: invisible.random( -400, 400 ),
+          y: invisible.random( -400, 400 )
+        },
+        rotation: {
+          x: false,
+          y: false
+        },
+        color: socket.handshake.session.passport.user.color,
+        Name: socket.handshake.session.passport.user.Name
+    };
 
+    user_data.push( user );
+    users.push( socket.handshake.session.passport.user.Name );
+    socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+    socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+  }
+  
 };
 
 io.on('connection', socket => {
