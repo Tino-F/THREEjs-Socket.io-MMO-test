@@ -70,6 +70,10 @@ host.on( 'your_position', data => {
 
 } );
 
+host.on( 'redirect', () => {
+  window.location = '/';
+});
+
 host.emit( 'your_position' );
 
 

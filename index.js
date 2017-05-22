@@ -86,36 +86,47 @@ function new_user ( socket ) {
     socket.broadcast.emit( 'new_user', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
     socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
   }
-  
+
 };
 
 io.on('connection', socket => {
 
-  new_user( socket );
+  if ( !socket.handshake.session.passport ) {
+    socket.emit( 'redirect' );
+  } else {
 
-  socket.on( 'your_position', () => {
-    socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
-  });
+    new_user( socket );
 
-  socket.on( 'gimme_users', () => {
-    socket.emit( 'gimme_users', user_data );
-  })
+    socket.on( 'your_position', () => {
+      socket.emit( 'your_position', user_data[ users.indexOf( socket.handshake.session.passport.user.Name ) ] );
+    });
 
-  socket.on( 'move', player => {
+    socket.on( 'gimme_users', () => {
+      socket.emit( 'gimme_users', user_data );
+    })
 
-    if ( player ) {
-      player.Name = socket.handshake.session.passport.user.Name;
-      user_data[ users.indexOf( player.Name ) ] = player;
-      socket.broadcast.emit( 'move', user_data[ users.indexOf( player.Name ) ] );
-    }
+    socket.on( 'move', player => {
 
-  });
+      if ( player ) {
+        player.Name = socket.handshake.session.passport.user.Name;
+        user_data[ users.indexOf( player.Name ) ] = player;
+        socket.broadcast.emit( 'move', user_data[ users.indexOf( player.Name ) ] );
+      }
 
-  socket.on( 'disconnect', () => {
-    socket.broadcast.emit( 'user_disconnect', socket.handshake.session.passport.user.Name );
-    user_data.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
-    users.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
-  } );
+      if ( !socket.handshake.session.passport.user ) {
+        socket.emit( 'redirect' );
+      }
+
+    });
+
+    socket.on( 'disconnect', () => {
+      socket.broadcast.emit( 'user_disconnect', socket.handshake.session.passport.user.Name );
+      user_data.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
+      users.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
+    } );
+
+  }
+
 })
 
 app.get( '/', invisible.home );

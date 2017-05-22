@@ -1,5 +1,5 @@
 'use strict';
-const url = 'mongodb://localhost:27017/';
+const url = 'mongodb://0.0.0.0:27017/';
 const MongoClient = require('mongodb').MongoClient;
 
 exports.encrypt = ( text ) => {
@@ -38,12 +38,12 @@ exports.find_user = ( q, callback ) => {
         }
       });
 
+    db.close();
+
     } else {
       callback( err, false );
       console.log( 'Failed to connect to server' );
     }
-
-    db.close();
 
   });
 };
