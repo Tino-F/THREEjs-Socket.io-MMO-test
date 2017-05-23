@@ -88,25 +88,37 @@ exports.register_post = ( req, res ) => {
     Color: req.body.color
   };
 
-  console.log( new_user );
-
-  MongoClient.connect(url, ( err, db ) => {
+  this.find_user( {Name: new_user.Name}, ( err, user ) => {
     if ( !err ) {
+      if ( !user ) {
 
-      db.collection('Profiles').insert( new_user, (err, r) => {
-        if ( !err ) {
-          console.log('Sucessfully added new user.')
-          res.redirect('/login');
-        } else {
-          res.render( 'register', { err: 'Registration failed due to an nternal server error. Please try again later.' } );
-        }
-      });
+        MongoClient.connect(url, ( err, db ) => {
+          if ( !err ) {
 
-      db.close();
+            db.collection( 'Profiles' ).insert( new_user, (err, r) => {
+              if ( !err ) {
+                console.log( 'Sucessfully added new user:', new_user.Name );
+                res.redirect( '/login' );
+              } else {
+                res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
+              }
+            });
 
+            db.close();
+
+          } else {
+            console.log( 'Failed to connect to database' );
+            console.log( err );
+            res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
+          }
+        });
+
+      } else {
+        res.render( 'register', { err: 'Username already exists.' } );
+      }
     } else {
-      console.log('Failed to connect to database');
-      res.render( 'register', { err: 'Registration failed due to an nternal server error. Please try again later.' } );
+      res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
     }
   });
+
 };

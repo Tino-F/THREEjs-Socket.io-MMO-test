@@ -8,6 +8,7 @@ html
   body
     div.register.container(align='center')
       h1 Register
+      p.error= err
 
       form(method='post', action='/register')
         span Username
