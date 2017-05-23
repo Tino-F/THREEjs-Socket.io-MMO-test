@@ -3,6 +3,72 @@ var players = [];
 var player_data = [];
 var player_model_geometry = new THREE.BoxBufferGeometry( 40, 40, 40);
 var player_model_material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+var WIDTH = window.innerWidth;
+var HEIGHT = window.innerHeight;
+var camera = new THREE.PerspectiveCamera(75, WIDTH/HEIGHT, 0.001, 6000);
+camera.position.z = 100;
+var scene = new THREE.Scene();
+scene.updateMatrixWorld( true );
+var renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( WIDTH, HEIGHT );
+renderer.setClearColor( 0x000000 );
+document.body.appendChild( renderer.domElement );
+var controls = new THREE.TrackballControls( camera );
+
+controls.addEventListener( 'change', function () {
+
+  var user_data = {
+    position: {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+    },
+    rotation: {
+      x: camera.rotation.x,
+      y: camera.rotation.y
+    },
+    color: center_geo.material.color
+  };
+
+  try {
+
+    host.emit( 'move', user_data );
+
+  } catch ( err ) {
+
+    console.log( err );
+
+  }
+
+});
+
+function randomNumber( min, max ) {
+  return Math.floor(Math.random() * ( ( max - min ) + 1 ) + min );
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+};
+
+window.addEventListener('resize', onWindowResize, false);
+
+var amb_light = new THREE.AmbientLight( { color: 0xffffff } );
+scene.add( amb_light );
+
+var shape_g = new THREE.ConeBufferGeometry( 40, 40, 40 );
+var shape_m = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+var center_geo = new THREE.Line( shape_g, shape_m );
+scene.add( center_geo );
+
+function main () {
+  requestAnimationFrame( main );
+  renderer.render( scene, camera );
+  controls.update();
+}
 
 host.on( 'gimme_users', users => {
 
@@ -29,8 +95,6 @@ host.on( 'gimme_users', users => {
 
 });
 
-host.emit( 'gimme_users' );
-
 host.on( 'move', function ( user ){
 
   console.log( 'moving', user.Name );
@@ -47,6 +111,7 @@ host.on( 'new_user', function( user ) {
   var player_model = new THREE.Mesh( player_model_geometry, player_model_material );
   player_model.position.set( user.position.x, user.position.y, user.position.z );
   scene.add( player_model );
+  console.log( user );
 
   players.push( user.Name );
   player_data.push( { position: { x: user.x, y: user.y, z: user.z }, color: user.color, model: player_model } );
@@ -56,7 +121,6 @@ host.on( 'new_user', function( user ) {
 host.on( 'your_position', function ( data ) {
 
   console.log( 'your position is', data );
-  console.log( data );
 
   camera.position.x = data.position.x;
   camera.position.y = data.position.y;
@@ -80,4 +144,7 @@ host.on( 'user_disconnect', Name => {
   player_data.splice( index )
 } );
 
+main();
+
 host.emit( 'your_position' );
+host.emit( 'gimme_users' );
