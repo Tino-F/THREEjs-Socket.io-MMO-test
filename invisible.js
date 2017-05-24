@@ -95,9 +95,8 @@ exports.register_post = ( req, res ) => {
         MongoClient.connect(url, ( err, db ) => {
           if ( !err ) {
 
-            db.collection( 'Profiles' ).insert( new_user, (err, r) => {
+            db.collection( 'Profiles' ).insert( new_user, ( err, r ) => {
               if ( !err ) {
-                console.log( 'Sucessfully added new user:', new_user.Name );
                 res.redirect( '/login' );
               } else {
                 res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );

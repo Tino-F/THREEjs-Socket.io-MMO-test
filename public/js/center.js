@@ -1,19 +1,18 @@
-var div, div_height, window_height, margin_top;
+"use strict";
 
-$(document).ready(function() {
-  div = $('#center');
-  div_height = div.height();
-  window_height = window.innerHeight;
-  margin_top = window_height - div_height;
+let div, margin_top;
 
-  div.css('margin-top', ( ( margin_top / 2 ) - 10 + 'px' ) );
-});
+window.onload = () => {
 
-$(window).on('resize', function () {
-  div = $('#center');
-  div_height = div.height();
-  window_height = window.innerHeight;
-  margin_top = window_height - div_height;
+  div = document.getElementById( 'center' );
+  margin_top = window.innerHeight - div.offsetHeight;
+  div.style.marginTop = ( ( margin_top / 2 ) - 10 ) + 'px';
 
-  div.css('margin-top', ( ( margin_top / 2 ) - 10 + 'px' ) );
-});
+};
+
+window.onresize = () => {
+
+  margin_top = window.innerHeight - div.offsetHeight;
+  div.style.marginTop = ( ( margin_top / 2 ) - 10 ) + 'px';
+
+};

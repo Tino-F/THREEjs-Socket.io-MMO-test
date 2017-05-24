@@ -50,7 +50,6 @@ function randomNumber( min, max ) {
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize( window.innerWidth, window.innerHeight );
 };
 
@@ -59,8 +58,8 @@ window.addEventListener('resize', onWindowResize, false);
 var amb_light = new THREE.AmbientLight( { color: 0xffffff } );
 scene.add( amb_light );
 
-var shape_g = new THREE.ConeBufferGeometry( 40, 40, 40 );
-var shape_m = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+var shape_g = new THREE.SphereBufferGeometry( 40, 40, 40 );
+var shape_m = new THREE.MeshNormalMaterial();
 var center_geo = new THREE.Line( shape_g, shape_m );
 scene.add( center_geo );
 
@@ -75,11 +74,16 @@ host.on( 'gimme_users', users => {
   console.log( 'User array: ', users );
 
   if ( users ) {
+
+    players = [];
+    player_data = [];
+
     for ( i=0; i < users.length; i++ ) {
 
       console.log( 'Received user,', users[ i ].Name, '.' );
       console.log( JSON.stringify( users[ i ] ) );
 
+      console.log( 'Adding', users[ i ].Name, 'to scene.' );
       players.push( users[ i ].Name );
       player_data.push( users[ i ] );
 
@@ -91,17 +95,29 @@ host.on( 'gimme_users', users => {
 
     }
 
+  } else {
+
+    console.log( "You're the only user!" );
+
   }
 
 });
 
 host.on( 'move', function ( user ){
 
-  console.log( 'moving', user.Name );
+  if ( !players.indexOf( user.Name ) ) {
 
-  player_data[ players.indexOf( user.Name ) ].model.position.set( user.position.x, user.position.y, user.position.z );
-  player_data[ players.indexOf( user.Name ) ].model.rotation.x = user.rotation.x;
-  player_data[ players.indexOf( user.Name ) ].model.rotation.y = user.rotation.y;
+    console.log( 'moving', user.Name );
+    player_data[ players.indexOf( user.Name ) ].model.position.set( user.position.x, user.position.y, user.position.z );
+    player_data[ players.indexOf( user.Name ) ].model.rotation.x = user.rotation.x;
+    player_data[ players.indexOf( user.Name ) ].model.rotation.y = user.rotation.y;
+
+  } else {
+
+    console.log( 'Error, retreiving users.' );
+    host.emit( 'gimme_users' );
+
+  }
 
 });
 
@@ -125,7 +141,7 @@ host.on( 'your_position', function ( data ) {
   camera.position.x = data.position.x;
   camera.position.y = data.position.y;
   camera.position.z = data.position.z;
-  camera.lookAt( 0, 0, 0);
+  camera.lookAt( 0, 0, 0 );
 
   host.emit( 'move' );
 
@@ -139,6 +155,7 @@ host.on( 'redirect', () => {
 host.on( 'user_disconnect', Name => {
   let index = players.indexOf( Name );
   console.log( 'Player,', Name, 'disconnected.');
+  console.log( 'Removing player from scene...' );
   scene.remove( player_data[ index ].model );
   players.splice( index );
   player_data.splice( index )

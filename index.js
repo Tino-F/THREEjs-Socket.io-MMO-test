@@ -71,15 +71,15 @@ io.use(socketsession(session, {
     autoSave: true
 } ));
 
-const users = [];
-const user_data = [];
+let users = [];
+let user_data = [];
 
 function new_user ( socket ) {
 
   let Name = socket.handshake.session.passport.user.Name;
   console.log( Name, 'connected.' );
 
-  if ( users.indexOf( Name ) < 0 ) {
+  if ( !users.indexOf( Name ) ) {
 
     let user = {
         position: {
@@ -156,16 +156,19 @@ io.on('connection', socket => {
       get_user_index( socket, ( i ) => {
 
         let other_users = user_data.splice( 0 );
-        other_users.splice( i, 1 );
+        console.log()
+        console.log( 'Sending user data.' );
+        console.log( other_users );
+        console.log()
+        list_current_users();
+        other_users.splice( i );
         socket.emit( 'gimme_users', other_users );
 
       })
 
-    })
+    });
 
     socket.on( 'move', player => {
-
-      console.log( player );
 
       if ( player ) {
         player.Name = socket.handshake.session.passport.user.Name;
@@ -181,9 +184,11 @@ io.on('connection', socket => {
 
     socket.on( 'disconnect', () => {
       console.log( socket.handshake.session.passport.user.Name, 'disconnected.' );
+      let index = users.indexOf( socket.handshake.session.passport.user.Name );
+      console.log( 'Removing from index', index );
       socket.broadcast.emit( 'user_disconnect', socket.handshake.session.passport.user.Name );
-      user_data.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
-      users.splice( users.indexOf( socket.handshake.session.passport.user.Name ), 1 );
+      user_data.splice( index, 1 );
+      users.splice( index, 1 );
     } );
 
   }
