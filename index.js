@@ -5,19 +5,22 @@ const LocalStrat = require('passport-local').Strategy;
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const sass = require('node-sass-middleware');
 const express = require('express');
 const expresssession = require('express-session');
 const socketsession = require('express-socket.io-session');
 const app = express();
 const url = 'mongodb://localhost:27017/';
 const invisible = require('./invisible');
+const public_dir = path.join( __dirname, 'public' );
 const session = expresssession({
   secret: 'fxxxxxxkeoiarjeajd',
   resave: false,
   saveUninitialized: false
 });
 
-app.use( express.static( path.join( __dirname, 'public' ) ) );
+app.use( express.static( public_dir ) );
+app.use( sass({ dest: public_dir, src: public_dir, debug: true }))
 app.use( cookieParser() );
 app.use( bodyParser.urlencoded( { extended: false } ) );
 app.use( session );
