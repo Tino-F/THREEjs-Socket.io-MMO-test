@@ -20,7 +20,7 @@ const session = expresssession({
 });
 
 app.use( express.static( public_dir ) );
-app.use( sass({ dest: public_dir, src: public_dir, debug: true }))
+app.use( sass({ src: public_dir, dest: public_dir, outputStyle: 'compressed', debug: true }))
 app.use( cookieParser() );
 app.use( bodyParser.urlencoded( { extended: false } ) );
 app.use( session );

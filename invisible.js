@@ -82,42 +82,54 @@ exports.register = ( req, res ) => {
 
 exports.register_post = ( req, res ) => {
 
+  console.log( req.body.password )
+
   let new_user = {
     Name: req.body.username,
     Password: this.encrypt( req.body.password ),
-    Color: req.body.color
+    Color: req.body.color,
+    Description: req.body.description
   };
 
-  this.find_user( {Name: new_user.Name}, ( err, user ) => {
-    if ( !err ) {
-      if ( !user ) {
 
-        MongoClient.connect(url, ( err, db ) => {
-          if ( !err ) {
+  if ( /\//.test( req.body.username ) ) {
 
-            db.collection( 'Profiles' ).insert( new_user, ( err, r ) => {
-              if ( !err ) {
-                res.redirect( '/login' );
-              } else {
-                res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
-              }
-            });
+    res.render( 'register', { err: 'Usernames cannot contain "/".' } );
 
-            db.close();
+  } else {
 
-          } else {
-            console.log( 'Failed to connect to database' );
-            console.log( err );
-            res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
-          }
-        });
+    this.find_user( { Name: new_user.Name }, ( err, user ) => {
+      if ( !err ) {
+        if ( !user ) {
 
+          MongoClient.connect(url, ( err, db ) => {
+            if ( !err ) {
+
+              db.collection( 'Profiles' ).insert( new_user, ( err, r ) => {
+                if ( !err ) {
+                  res.redirect( '/login' );
+                } else {
+                  res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
+                }
+              });
+
+              db.close();
+
+            } else {
+              console.log( 'Failed to connect to database' );
+              console.log( err );
+              res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
+            }
+          });
+
+        } else {
+          res.render( 'register', { err: 'Username already exists.' } );
+        }
       } else {
-        res.render( 'register', { err: 'Username already exists.' } );
+        res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
       }
-    } else {
-      res.render( 'register', { err: 'Registration failed due to an internal server error. Please try again later.' } );
-    }
-  });
+    });
+
+  }
 
 };

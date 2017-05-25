@@ -42,7 +42,7 @@ body {
     margin-bottom: 20px;
   }
 
-  p:nth-child(0) {
+  p:nth-child( 0 ) {
     padding-bottom: 10px;
     border-bottom: 1px solid white;
     width: 500px;
@@ -53,4 +53,59 @@ body {
 .error {
   color: #f44242;
   background: black;
+}
+
+.login-err {
+  color: #f44242;
+  background: rgba( 255, 255, 255, 0.1 );
+  width: 500px;
+  box-shadow: 3px 3px 5px black;
+}
+
+.register_body {
+  background: url( '/imgs/space4.jpg' );
+}
+
+.register {
+
+  box-shadow: 10px 10px 20px black;
+  padding: 0;
+  color: white;
+
+  h1 {
+
+    margin: 0 0 50px 0;
+    padding: 10px 0 10px 0;
+    border-bottom: 1px solid grey;
+    background: rgba( 255, 255, 255, 0.4 );
+    color: white;
+
+  }
+
+  input {
+
+    width: 300px;
+    margin: 0 0 40px 0;
+    border-radius: 0;
+    border: 0;
+    box-shadow: 0;
+    color: black;
+
+  }
+
+  textarea {
+
+    width: 300px;
+    color: black;
+
+  }
+
+  button {
+
+    width: 500px;
+    border-radius: 0;
+    box-shadow: 0;
+
+  }
+
 }
