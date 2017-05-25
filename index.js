@@ -79,7 +79,7 @@ function new_user ( socket ) {
   let Name = socket.handshake.session.passport.user.Name;
   console.log( Name, 'connected.' );
 
-  if ( !users.indexOf( Name ) ) {
+  if ( users.indexOf( Name ) < 0 ) {
 
     let user = {
         position: {
