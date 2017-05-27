@@ -177,6 +177,7 @@ io.on('connection', socket => {
         player.Name = socket.handshake.session.passport.user.Name;
         user_data[ users.indexOf( player.Name ) ] = player;
         socket.broadcast.emit( 'move', player );
+        console.log( player );
       }
 
       if ( !socket.handshake.session.passport.user ) {
